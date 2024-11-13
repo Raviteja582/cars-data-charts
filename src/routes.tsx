@@ -2,7 +2,6 @@ import React from "react";
 
 // Admin Imports
 import MainDashboard from "views/user/default";
-import NFTMarketplace from "views/user/marketplace";
 import Profile from "views/user/profile";
 
 // Auth Imports
@@ -11,7 +10,6 @@ import SignIn from "views/auth/SignIn";
 // Icon Imports
 import {
   MdHome,
-  MdOutlineShoppingCart,
   MdPerson,
   MdLock,
   MdLineAxis,
@@ -34,14 +32,6 @@ const routes = [
     path: "default",
     icon: <MdHome className="h-6 w-6" />,
     component: <MainDashboard />,
-  },
-  {
-    name: "NFT Marketplace",
-    layout: "/user",
-    path: "nft-marketplace",
-    icon: <MdOutlineShoppingCart className="h-6 w-6" />,
-    component: <NFTMarketplace />,
-    secondary: true,
   },
   {
     name: "Chart",
