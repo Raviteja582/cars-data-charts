@@ -46,13 +46,13 @@ const routes = [
         icon: <MdLineAxis className="h-6 w-6" />,
         component: <PriceChart />,
       },
-      {
-        name: "SalesChart",
-        layout: "/user",
-        path: "charts/salesChart",
-        icon: <MdPieChart className="h-6 w-6" />,
-        component: <PriceChart />,
-      },
+      // {
+      //   name: "SalesChart",
+      //   layout: "/user",
+      //   path: "charts/salesChart",
+      //   icon: <MdPieChart className="h-6 w-6" />,
+      //   component: <PriceChart />,
+      // },
     ],
   },
   {
