@@ -1,0 +1,10 @@
+.chart-outer {
+  position: relative;
+  padding-bottom: 10%;
+}
+
+.chart-inner {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}

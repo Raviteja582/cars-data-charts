@@ -15,12 +15,18 @@ const Sidebar = (props: {
         open ? "translate-x-0" : "-translate-x-96"
       }`}
     >
+      <span
+        className="absolute right-4 top-4 block cursor-pointer xl:hidden"
+        onClick={onClose}
+      >
+        <HiX />
+      </span>
       <div className={`mx-[35px] mt-[50px] flex items-center`}>
-        <div className="mt-1 ml-1 h-2.5 font-poppins text-[26px] font-bold uppercase text-navy-700 dark:text-white">
+        <div className="ml-1 mt-1 h-2.5 font-poppins text-[26px] font-bold uppercase text-navy-700 dark:text-white">
           Car <span className="font-medium">Informatics</span>
         </div>
       </div>
-      <div className="mt-[58px] mb-7 h-px bg-gray-300 dark:bg-white/30" />
+      <div className="mb-7 mt-[58px] h-px bg-gray-300 dark:bg-white/30" />
       {/* Nav item */}
 
       <ul className="mb-auto pt-1">

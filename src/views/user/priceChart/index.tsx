@@ -1,40 +1,34 @@
 import { CircularProgress, Typography } from "@mui/material";
-import { BaseSyntheticEvent, useState } from "react";
+import { BaseSyntheticEvent, useCallback, useState } from "react";
 import AsyncSelect from "react-select/async";
+import Select, { ActionMeta } from "react-select";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../../store/store";
-import {
-  UserSelectionOptions,
-  getModelState,
-  setBrands,
-  setIDs,
-  setModels,
-  setTrims,
-} from "../../../store/models/modelsStore";
+import { UserSelectionOptions } from "../../../store/models/modelsStore";
 import { MultiValue } from "react-select";
-import { capitalize, isEmpty, isEqual, lowerCase } from "lodash";
+import { capitalize, isEmpty, some } from "lodash";
 import {
   fetchBrandNameWithPrefix,
+  fetchCarPrices,
+  fetchCityNameWithPrefix,
   fetchModelNameWithPrefix,
-  fetchTrimNameWithPrefix,
 } from "../../../store/models/modelOperations";
-import { Prices } from "../../../store/prices/priceStore";
-import { fetchCarPricesByIds } from "../../../store/prices/priceOperations";
 import { LineChartFromHighChart as LineGraph } from "./LineChartDisplay";
+import "./style.css";
 
 function LineGraphData() {
   const isloading = useSelector<RootState, boolean>(
-    (state) => state.prices.isFetchingPrice
+    (state) => state.models.isLoading
   );
-  const pricesData = useSelector<RootState, Record<string, Prices>>(
-    (state) => state.prices.currentPriceData
+  const pricesData = useSelector<RootState, Record<string, number[][]>>(
+    (state) => state.models.lineSeries
   );
 
-  // console.log("price data from store: ", JSON.stringify(pricesData));
+  console.log("price data from store: ", JSON.stringify(pricesData));
 
   if (isloading) {
     return (
-      <div>
+      <div className="m-0 p-0">
         <CircularProgress size="10rem" />
       </div>
     );
@@ -55,159 +49,199 @@ function LineGraphData() {
 
 function UserSelectionComponent() {
   const dispatch = useAppDispatch();
-  const { brand_names, model_names, trim_names, iDs } =
-    useSelector(getModelState);
 
-  // console.log("in store detailed: ", brand_name, model_name, trim_name);
+  const [brandNames, setBrandNames] = useState<UserSelectionOptions[]>([]);
+  const [modelNames, setModelNames] = useState<UserSelectionOptions[]>([]);
+  const [cityNames, setCityNames] = useState<UserSelectionOptions[]>([]);
+  const [carConditions, setCarConditions] = useState<UserSelectionOptions[]>(
+    []
+  );
 
-  const [brandNames, setBrandNames] = useState<string[]>(brand_names);
-  const [modelNames, setModelNames] = useState<string[]>(model_names);
-  const [trimNames, setTrimNames] =
-    useState<UserSelectionOptions[]>(trim_names);
+  const getUserInputBrandNames = useCallback(
+    async (inputValue: string) => {
+      console.log("searched string", inputValue);
+      if (inputValue === "") return [];
+      const results = await dispatch(
+        fetchBrandNameWithPrefix(inputValue)
+      ).unwrap();
+      console.log("inside component: ", results);
+      return results;
+    },
+    [dispatch]
+  );
 
-  const onBrandChange = (newValues: MultiValue<UserSelectionOptions>) => {
-    if (newValues.length >= 5) return;
-    setBrandNames(() => {
-      return newValues.map((val) => val.value);
-    });
-    if (isEmpty(newValues)) {
-      setModelNames([]);
-    }
-  };
+  const getUserInputModelNames = useCallback(
+    async (inputValue: string) => {
+      console.log("searched string", inputValue);
+      if (inputValue === "") return [];
+      const results = await dispatch(
+        fetchModelNameWithPrefix({
+          prefixString: inputValue,
+        })
+      ).unwrap();
+      console.log("inside component: ", results);
+      return results;
+    },
+    [dispatch]
+  );
 
-  const onModelChange = (newValues: MultiValue<UserSelectionOptions>) => {
-    if (newValues.length >= 5) return;
-    setModelNames(() => {
-      return newValues.map((val) => val.value);
-    });
-    if (isEmpty(newValues)) {
-      setTrimNames([]);
-    }
-  };
-
-  const onTrimChange = (newValues: MultiValue<UserSelectionOptions>) => {
-    if (newValues.length >= 5) return;
-    setTrimNames(() => {
-      return newValues as UserSelectionOptions[];
-    });
-  };
-
-  const getUserInputBrandNames = async (inputValue: string) => {
-    // console.log('searched string', inputValue);
-    if (inputValue === "") return [];
-    const results = await dispatch(
-      fetchBrandNameWithPrefix(lowerCase(inputValue))
-    ).unwrap();
-    // console.log("inside component: ", results);
-    return results;
-  };
-
-  const getUserInputTrimNames = async (inputValue: string) => {
-    // console.log('searched string', inputValue);
-    if (inputValue === "") return [];
-    const results = await dispatch(
-      fetchTrimNameWithPrefix({
-        prefixString: lowerCase(inputValue),
-        brandNames,
-        modelNames,
-      })
-    ).unwrap();
-    return results;
-  };
-
-  const getUserInputModelNames = async (inputValue: string) => {
-    // console.log('searched string', inputValue);
-    if (inputValue === "") return [];
-    const results = await dispatch(
-      fetchModelNameWithPrefix({
-        prefixString: lowerCase(inputValue),
-        brandNames,
-      })
-    ).unwrap();
-    // console.log("inside component: ", results);
-    return results;
-  };
+  const getUserInputCityNames = useCallback(
+    async (inputValue: string) => {
+      console.log("searched string", inputValue);
+      if (inputValue === "") return [];
+      const results = await dispatch(
+        fetchCityNameWithPrefix({
+          prefixString: inputValue,
+        })
+      ).unwrap();
+      console.log("inside component: ", results);
+      return results;
+    },
+    [dispatch]
+  );
 
   const handleSubmit = (event: BaseSyntheticEvent) => {
     event.preventDefault();
-    const currenrIds = trimNames.map((val) => val.id);
-    console.log("selected trims: ", currenrIds);
-    console.log("prev ids: ", iDs);
-
-    if (isEqual(iDs, currenrIds)) return;
-
-    dispatch(setModels(modelNames));
-    dispatch(setBrands(brandNames));
-    dispatch(setTrims(trimNames));
-    dispatch(setIDs(currenrIds));
-    dispatch(fetchCarPricesByIds(currenrIds));
+    dispatch(
+      fetchCarPrices({
+        brandNames: brandNames.map((brand) => brand.value),
+        modelNames: modelNames.map((model) => model.value),
+        cities: cityNames.map((city) => city.value),
+        conditions: carConditions.map((condition) => condition.value),
+      })
+    );
   };
 
+  const onSelectChange = useCallback(
+    (
+      selection: MultiValue<UserSelectionOptions>,
+      actionMeta: ActionMeta<any>
+    ) => {
+      if (actionMeta.name === "brand_name") {
+        setBrandNames(() => selection as UserSelectionOptions[]);
+        if (!isEmpty(modelNames)) {
+          let validModels: UserSelectionOptions[] = [];
+          selection.forEach((brand) => {
+            modelNames.forEach((model, indx) => {
+              if (model.brand_name === brand.value) {
+                validModels.push(model);
+              }
+            });
+          });
+          setModelNames(() => validModels);
+        }
+      } else if (actionMeta.name === "model_name") {
+        setModelNames(() => selection as UserSelectionOptions[]);
+        let notSelectedBrands = new Set<UserSelectionOptions>();
+        const currentBrands = brandNames.map((brand) => brand.value);
+        console.log("current brands: ", currentBrands);
+        selection.forEach((model) => {
+          const brands = some(
+            currentBrands,
+            (brand_name: string) => brand_name === model.brand_name
+          );
+          console.log(brands);
+          if (!brands) {
+            notSelectedBrands.add({
+              label: capitalize(model.brand_name),
+              value: model.brand_name,
+            });
+          }
+        });
+
+        if (!isEmpty(notSelectedBrands)) {
+          console.log(notSelectedBrands);
+          setBrandNames((prevValue) => {
+            prevValue.push(...notSelectedBrands);
+            return prevValue;
+          });
+        }
+      } else if (actionMeta.name === "city_name") {
+        setCityNames(() => selection as UserSelectionOptions[]);
+      } else if (actionMeta.name === "car_condition") {
+        setCarConditions(() => selection as UserSelectionOptions[]);
+      }
+    },
+    [brandNames, modelNames]
+  );
+
   return (
-    <div className="grid grid-cols-4 gap-5">
+    <div className="grid grid-cols-5 grid-rows-2 gap-2 overflow-auto md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-5">
       <div>
-        <Typography>Brand Name:</Typography>
+        <Typography>Brand Name: </Typography>
         <div>
           <AsyncSelect
+            name="brand_name"
             cacheOptions
             defaultOptions
             loadOptions={getUserInputBrandNames}
-            onChange={onBrandChange}
+            onChange={onSelectChange}
             isClearable={true}
+            value={brandNames}
             isMulti
-            value={[
-              ...brandNames.map((val) => ({
-                label: capitalize(val),
-                value: val,
-              })),
-            ]}
+            placeholder="ALL"
           />
         </div>
       </div>
       <div>
-        <Typography>Model Name:</Typography>
+        <Typography>Model Name: </Typography>
         <div>
           <AsyncSelect
+            name="model_name"
             cacheOptions
             defaultOptions
             loadOptions={getUserInputModelNames}
-            onChange={onModelChange}
+            onChange={onSelectChange}
             isClearable={true}
             isMulti
-            isDisabled={isEmpty(brandNames)}
-            value={[
-              ...modelNames.map((val) => ({
-                label: capitalize(val),
-                value: val,
-              })),
-            ]}
+            value={modelNames}
+            placeholder="ALL"
           />
         </div>
       </div>
       <div>
-        <Typography>Trim Name:</Typography>{" "}
+        <Typography>City Name: </Typography>
         <div>
           <AsyncSelect
+            name="city_name"
             cacheOptions
             defaultOptions
-            loadOptions={getUserInputTrimNames}
-            onChange={onTrimChange}
+            loadOptions={getUserInputCityNames}
+            onChange={onSelectChange}
             isClearable={true}
             isMulti
-            isDisabled={isEmpty(brandNames) || isEmpty(modelNames)}
-            value={[
-              ...trimNames,
-              // .map((val) => ({
-              //   label: capitalize(val.value),
-              //   value: val.value,
-              // })),
-            ]}
+            placeholder="ALL"
           />
         </div>
       </div>
-      <button onClick={handleSubmit} className="border-2">
-        Submit
-      </button>
+      <div className="col-span-1 row-span-1">
+        <div>
+          <Typography>Car Condition:</Typography>
+          <div>
+            <Select
+              name="car_condition"
+              options={[
+                { value: "New", label: "New" },
+                { value: "Used", label: "Used" },
+              ]}
+              onChange={onSelectChange}
+              isClearable={true}
+              isMulti
+              placeholder="ALL"
+            />
+          </div>
+        </div>
+      </div>
+      <div className="col-span-1 row-span-1">
+        <div>
+          <button
+            onClick={handleSubmit}
+            className="ml-8 mt-5 border-2 pb-1 pl-8 pr-8 pt-2"
+          >
+            <Typography>Submit</Typography>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -215,15 +249,17 @@ function UserSelectionComponent() {
 export default function LineChartIcon() {
   return (
     <div>
-      <div className="mt-5">
+      <div className="mt-5 h-full">
         <Typography>Price Chart For A Brand</Typography>
       </div>
-      <div className="mt-5 grid grid-cols-3 gap-4">
-        <div className="col-span-2">
-          <UserSelectionComponent/>
+      <div className="mt-5 grid grid-rows-4 gap-2">
+        <div className="h-40 overflow-auto">
+          <UserSelectionComponent />
         </div>
-        <div className="col-span-3">
-          <LineGraphData />
+        <div className="chart-outer row-span-3 mr-0">
+          <div className="chart-inner">
+            <LineGraphData />
+          </div>
         </div>
       </div>
     </div>
