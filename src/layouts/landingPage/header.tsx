@@ -14,19 +14,12 @@ export default function BasicPageHeader() {
               alt="Landwind Logo"
             />
             <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-              Landwind
+              CarInfomatics
             </span>
           </Link>
           <div className="flex items-center lg:order-2">
-            <div className="mr-4 mt-2 hidden sm:inline-block">
-              <Link
-                className="github-button"
-                to="/auth/signin"
-                data-size="large"
-                data-icon="octicon-star"
-                data-show-count="true"
-                aria-label="Star themesberg/landwind on GitHub"
-              >
+            <div className="mr-4 mt-2 sm:inline-block">
+              <Link className="github-button" to="/auth/signin">
                 Login
               </Link>
             </div>
@@ -78,7 +71,7 @@ export default function BasicPageHeader() {
               <li>
                 <Link
                   to="#"
-                  className="lg:bg-transparent block rounded bg-purple-700 py-2 pl-3 pr-4 text-white dark:text-white lg:p-0 lg:text-purple-700"
+                  className="lg:hover:bg-transparent lg:dark:hover:bg-transparent block border-b border-gray-100 py-2 pl-3 pr-4 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white lg:border-0 lg:p-0 lg:hover:text-purple-700 lg:dark:hover:text-white"
                   aria-current="page"
                 >
                   Home
