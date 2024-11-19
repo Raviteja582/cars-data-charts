@@ -42,7 +42,7 @@ const Dashboard = () => {
         />
       </div>
 
-      <div>
+      <div className="mt-4">
         <CarouselComponent />
       </div>
     </div>

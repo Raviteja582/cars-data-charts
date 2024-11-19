@@ -1,35 +1,59 @@
 import React from "react";
 import Carousel from "react-material-ui-carousel";
-import { Paper, Button } from "@mui/material";
+import { Paper } from "@mui/material";
+import BrandsComparisons from "assets/img/dashboards/BrandsComparison.png";
+import ModelComparisons from "assets/img/dashboards/ModelsComparison.png";
+import CitiesComparisons from "assets/img/dashboards/CitiesComparison.png";
+import Home from "@mui/icons-material/Home";
 
 export default function CarouselComponent() {
   var items = [
     {
-      name: "Random Name #1",
-      description: "Probably the most random thing you have ever seen!",
+      name: "Brands Comparisons",
+      description: "Compare Avg Sale of Price between brands over all Models",
+      image: BrandsComparisons,
     },
     {
-      name: "Random Name #2",
-      description: "Hello World!",
+      name: "Models Comparisons ",
+      description:
+        "Compare Avg Sale of Models between Models of different Brands",
+      image: ModelComparisons,
+    },
+    {
+      name: "Area Comparisons",
+      description: "Compare Avg Sale of Car Sales in different Cities.",
+      image: CitiesComparisons,
     },
   ];
 
   return (
-    <Carousel>
+    <Carousel IndicatorIcon={<Home />} autoPlay={true} interval={2000}>
       {items.map((item, i) => (
-        <Item key={i} name={item.name} description={item.description} />
+        <Item
+          key={i}
+          name={item.name}
+          description={item.description}
+          image={item.image}
+        />
       ))}
     </Carousel>
   );
 }
 
-function Item({ name, description }: { name: string; description: string }) {
+function Item({
+  name,
+  description,
+  image,
+}: {
+  name: string;
+  description: string;
+  image: any;
+}) {
   return (
     <Paper>
-      <h2>{name}</h2>
-      <p>{description}</p>
-
-      <Button className="CheckButton">Check it out!</Button>
+      <h2 className="text-center text-4xl">{name}</h2>
+      <p className="text-center text-2xl">{description}</p>
+      <img src={image} alt="" />
     </Paper>
   );
 }

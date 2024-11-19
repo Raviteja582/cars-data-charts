@@ -13,7 +13,6 @@ import {
   MdPerson,
   MdLock,
   MdLineAxis,
-  MdPieChart,
 } from "react-icons/md";
 import PriceChart from "views/user/priceChart";
 import BasicHomePage from "views/basic/home";
