@@ -11,29 +11,10 @@ export default function BasicFooterPage() {
             to="#"
             className="mb-5 flex items-center justify-center text-2xl font-semibold text-gray-900 dark:text-white"
           >
-            <img
-              src="./images/logo.svg"
-              className="mr-3 h-6 sm:h-9"
-              alt="Landwind Logo"
-            />
-            Landwind
+            CarInfomatics
           </Link>
           <span className="block text-center text-sm text-gray-500 dark:text-gray-400">
-            © 2021-2022 Landwind™. All Rights Reserved. Built with{" "}
-            <Link
-              to="https://flowbite.com"
-              className="text-purple-600 hover:underline dark:text-purple-500"
-            >
-              Flowbite
-            </Link>{" "}
-            and{" "}
-            <Link
-              to="https://tailwindcss.com"
-              className="text-purple-600 hover:underline dark:text-purple-500"
-            >
-              Tailwind CSS
-            </Link>
-            .
+            © 2021-2022 Landwind™. All Rights Reserved.
           </span>
         </div>
       </div>
