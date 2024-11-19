@@ -1,3 +1,4 @@
+import { CircularProgress, Typography } from "@mui/material";
 import { BaseSyntheticEvent, useCallback, useState } from "react";
 import AsyncSelect from "react-select/async";
 import Select, { ActionMeta } from "react-select";
@@ -14,7 +15,6 @@ import {
 } from "../../../store/models/modelOperations";
 import { LineChartFromHighChart as LineGraph } from "./LineChartDisplay";
 import "./style.css";
-import { CircularProgress, Typography } from "@mui/material";
 
 function LineGraphData() {
   const isloading = useSelector<RootState, boolean>(
