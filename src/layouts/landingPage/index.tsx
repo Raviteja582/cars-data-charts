@@ -1,7 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import BasicPageHeader from "./header";
 import routes from "routes";
-import "assets/css/landingPage.css";
 import BasicFooterPage from "./footer";
 
 export default function LandingPage() {

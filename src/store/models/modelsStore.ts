@@ -1,62 +1,54 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../store";
+import { createSlice } from "@reduxjs/toolkit";
+import { fetchCarPrices } from "./modelOperations";
 
 export interface UserSelectionOptions {
   value: string;
   label: string;
-  isFixed?: boolean;
-  id?: string;
+  brand_name?: string;
+  model_name?: string;
 }
 
 export interface CarModel {
+  // Exactly same as firebase collection
   id: string;
   brand_name: string;
   model_name: string;
-  trim_name: string;
+  city_name: string;
+  car_condition: string;
 }
 
 export interface ModelState {
-  iDs: string[];
-  brand_names: string[];
-  model_names: string[];
-  trim_names: UserSelectionOptions[];
+  isLoading: boolean;
+  lineSeries: Record<string, number[][]>;
 }
 
 const initialState: ModelState = {
-  iDs: [],
-  brand_names: [],
-  model_names: [],
-  trim_names: [],
+  isLoading: false,
+  lineSeries: {},
 };
 
 export const modelsSlice = createSlice({
   name: "models",
   initialState,
-  reducers: {
-    setBrands(state: ModelState, { payload }: PayloadAction<string[]>) {
-      state.brand_names = payload;
-    },
-    setModels(state: ModelState, { payload }: PayloadAction<string[]>) {
-      state.model_names = payload;
-    },
-    setTrims(
-      state: ModelState,
-      { payload }: PayloadAction<UserSelectionOptions[]>
-    ) {
-      state.trim_names = payload;
-    },
-    setIDs(state: ModelState, { payload }: PayloadAction<string[]>) {
-      state.iDs = payload;
-    },
+  reducers: {},
+  extraReducers(builder) {
+    builder.addCase(fetchCarPrices.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(fetchCarPrices.fulfilled, (state, action) => {
+      state.lineSeries = action.payload;
+      console.log("price store current priceData: ", state.lineSeries);
+    });
+    builder.addMatcher(fetchCarPrices.settled, (state, action) => {
+      state.isLoading = false;
+    });
+    // builder.addMatcher(fetchCarPrices.rejected, (state, error) => {
+    //   state.isLoading = false;
+    // });
   },
 });
 
-export const getModelState = (store: RootState): ModelState => {
-  console.log("reading models: ", store.models);
-  return store.models;
-};
-
 // Action creators are generated for each case reducer function
-export const { setBrands, setModels, setTrims, setIDs } = modelsSlice.actions;
+// export const {} = modelsSlice.actions;
 
 export default modelsSlice.reducer;

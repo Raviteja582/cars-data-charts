@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import ProjectLogo from "../../assets/img/layout/company.png";
+import "./landingPage.css";
 
 export default function BasicPageHeader() {
   return (
@@ -81,22 +82,6 @@ export default function BasicPageHeader() {
                   aria-current="page"
                 >
                   Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="#"
-                  className="lg:hover:bg-transparent lg:dark:hover:bg-transparent block border-b border-gray-100 py-2 pl-3 pr-4 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white lg:border-0 lg:p-0 lg:hover:text-purple-700 lg:dark:hover:text-white"
-                >
-                  Company
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="#"
-                  className="lg:hover:bg-transparent lg:dark:hover:bg-transparent block border-b border-gray-100 py-2 pl-3 pr-4 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white lg:border-0 lg:p-0 lg:hover:text-purple-700 lg:dark:hover:text-white"
-                >
-                  Marketplace
                 </Link>
               </li>
               <li>

@@ -4,6 +4,7 @@ import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
 // import Footer from "components/footer/Footer";
 import routes from "routes";
+import PrivateRoutes from "layouts/auth/privateRouter";
 
 export default function Admin(props: { [x: string]: any }) {
   const { ...rest } = props;
@@ -72,29 +73,32 @@ export default function Admin(props: { [x: string]: any }) {
   document.documentElement.dir = "ltr";
   return (
     <div className="flex h-full w-full">
-      <Sidebar open={open} onClose={() => setOpen(false)} />
+      <Sidebar open={open} onClose={() => setOpen((prev) => !prev)} />
       {/* Navbar & Main Content */}
       <div className="h-full w-full bg-lightPrimary dark:!bg-navy-900">
         {/* Main Content */}
         <main
-          className={`mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[313px]`}
+          className={`mx-[12px] h-full flex-none transition-all md:pr-2 ${
+            open ? "xl:ml-[300px]" : "xl-ml-[21px]"
+          }`}
         >
           {/* Routes */}
           <div className="h-full">
             <Navbar
-              onOpenSidenav={() => setOpen(true)}
               brandText={currentRoute}
               secondary={getActiveNavbar(routes)}
               {...rest}
             />
             <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
               <Routes>
-                {getRoutes(routes)}
+                <Route element={<PrivateRoutes />}>
+                  {getRoutes(routes)}
 
-                <Route
-                  path="/"
-                  element={<Navigate to="/user/default" replace />}
-                />
+                  <Route
+                    path="/"
+                    element={<Navigate to="/user/default" replace />}
+                  />
+                </Route>
               </Routes>
             </div>
           </div>

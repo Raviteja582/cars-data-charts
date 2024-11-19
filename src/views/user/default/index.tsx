@@ -1,44 +1,46 @@
-import { IoMdHome } from "react-icons/io";
-import { IoDocuments } from "react-icons/io5";
-import { MdBarChart, MdDashboard } from "react-icons/md";
 import Widget from "components/widget/Widget";
+import CarouselComponent from "./carousel";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import ElectricCarIcon from "@mui/icons-material/ElectricCar";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import NumbersIcon from "@mui/icons-material/Numbers";
 
 const Dashboard = () => {
   return (
     <div>
       {/* Card widget */}
 
-      <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-6">
+      <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-5">
         <Widget
-          icon={<MdBarChart className="h-7 w-7" />}
-          title={"Earnings"}
-          subtitle={"$340.5"}
+          icon={<DirectionsCarIcon className="h-7 w-7" />}
+          title={"Brands"}
+          subtitle={"103"}
         />
         <Widget
-          icon={<IoDocuments className="h-6 w-6" />}
-          title={"Spend this month"}
-          subtitle={"$642.39"}
+          icon={<ElectricCarIcon className="h-6 w-6" />}
+          title={"Models"}
+          subtitle={"1883"}
         />
         <Widget
-          icon={<MdBarChart className="h-7 w-7" />}
-          title={"Sales"}
-          subtitle={"$574.34"}
+          icon={<ApartmentIcon className="h-7 w-7" />}
+          title={"Cities"}
+          subtitle={"3393"}
         />
         <Widget
-          icon={<MdDashboard className="h-6 w-6" />}
-          title={"Your Balance"}
-          subtitle={"$1,000"}
+          icon={<AttachMoneyIcon className="h-6 w-6" />}
+          title={"Total Purchase Amount(billions)"}
+          subtitle={"$2540.00 B"}
         />
         <Widget
-          icon={<MdBarChart className="h-7 w-7" />}
-          title={"New Tasks"}
-          subtitle={"145"}
+          icon={<NumbersIcon className="h-6 w-6" />}
+          title={"Total Sales"}
+          subtitle={"64.12M"}
         />
-        <Widget
-          icon={<IoMdHome className="h-6 w-6" />}
-          title={"Total Projects"}
-          subtitle={"$2433"}
-        />
+      </div>
+
+      <div className="mt-4">
+        <CarouselComponent />
       </div>
     </div>
   );
