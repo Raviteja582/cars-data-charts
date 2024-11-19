@@ -1,7 +1,38 @@
 import InputField from "components/fields/InputField";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { BaseSyntheticEvent, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { auth } from "store/firebase";
 
 export default function SignIn() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleSignIn = async (event: BaseSyntheticEvent) => {
+    try {
+      const usercredentials = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      if (usercredentials.user.email === email) {
+        // confirmation both from firebase and current
+        sessionStorage.setItem("isAuthenticated", "true");
+        navigate("/user");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    event.preventDefault();
+  };
+
+  if (sessionStorage.getItem("isAuthenticated")) {
+    return <Navigate to={"/user"} replace />;
+  }
+
   return (
     <div className="mb-16 mt-16 flex h-full w-full items-center justify-center px-2 md:mx-0 md:px-0 lg:mb-10 lg:items-center lg:justify-start">
       {/* Sign in section */}
@@ -33,6 +64,9 @@ export default function SignIn() {
           placeholder="mail@simmmple.com"
           id="email"
           type="text"
+          onChange={(event: BaseSyntheticEvent) => {
+            setEmail(() => event.target.value);
+          }}
         />
 
         {/* Password */}
@@ -43,28 +77,34 @@ export default function SignIn() {
           placeholder="Min. 8 characters"
           id="password"
           type="password"
+          onChange={(event: BaseSyntheticEvent) =>
+            setPassword(() => event.target.value)
+          }
         />
-        <div className="mb-4 flex items-center justify-between px-2">
+        {/* <div className="mb-4 flex items-center justify-between px-2">
           <a
             className="text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"
             href=" "
           >
             Forgot Password?
           </a>
-        </div>
-        <button className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200">
+        </div> */}
+        <button
+          onClick={handleSignIn}
+          className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"
+        >
           Sign In
         </button>
         <div className="mt-4">
           <span className=" text-sm font-medium text-navy-700 dark:text-gray-600">
             Not registered yet?
           </span>
-          <a
-            href=" "
+          <Link
+            to="/auth/signup"
             className="ml-1 text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"
           >
             Create an account
-          </a>
+          </Link>
         </div>
       </div>
     </div>

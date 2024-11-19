@@ -3,25 +3,34 @@ import { BaseSyntheticEvent, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { auth } from "store/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const navigate = useNavigate();
+
   const handleSignUp = async (event: BaseSyntheticEvent) => {
-    console.log(email, password);
     try {
       const usercredentials = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      console.log(usercredentials);
+      if (usercredentials.user.email === email) {
+        // confirmation both from firebase and current
+        navigate("/auth/signin");
+      }
     } catch (err) {
       console.log(err);
     }
     event.preventDefault();
   };
+
+  if (sessionStorage.getItem("isAuthenticated")) {
+    return <Navigate to={"/user"} replace />;
+  }
 
   return (
     <div className="mb-16 mt-16 flex h-full w-full items-center justify-center px-2 md:mx-0 md:px-0 lg:mb-10 lg:items-center lg:justify-start">
@@ -76,6 +85,17 @@ export default function SignUp() {
         >
           Sign Up
         </button>
+        <div className="mt-4">
+          <span className=" text-sm font-medium text-navy-700 dark:text-gray-600">
+            Already registered ?
+          </span>
+          <Link
+            to="/auth/signin"
+            className="ml-1 text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"
+          >
+            Sign In
+          </Link>
+        </div>
       </div>
     </div>
   );

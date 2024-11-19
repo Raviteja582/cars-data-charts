@@ -53,7 +53,7 @@ function Item({
     <Paper>
       <h2 className="text-center text-4xl">{name}</h2>
       <p className="text-center text-2xl">{description}</p>
-      <img src={image} alt="" />
+      <img src={image} alt="" className="ml-auto mr-auto"/>
     </Paper>
   );
 }
