@@ -75,7 +75,7 @@ export default function Admin(props: { [x: string]: any }) {
     <div className="flex h-full w-full">
       <Sidebar open={open} onClose={() => setOpen((prev) => !prev)} />
       {/* Navbar & Main Content */}
-      <div className="h-full w-full bg-lightPrimary dark:!bg-navy-900">
+      <div className="min-h-full w-full bg-lightPrimary dark:!bg-navy-900">
         {/* Main Content */}
         <main
           className={`mx-[12px] h-full flex-none transition-all md:pr-2 ${
@@ -89,7 +89,7 @@ export default function Admin(props: { [x: string]: any }) {
               secondary={getActiveNavbar(routes)}
               {...rest}
             />
-            <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
+            <div className="pt-5s mx-auto mb-auto h-full min-h-[70vh] p-2 md:pr-2">
               <Routes>
                 <Route element={<PrivateRoutes />}>
                   {getRoutes(routes)}
