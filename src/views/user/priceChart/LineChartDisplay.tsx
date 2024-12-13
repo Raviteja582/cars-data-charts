@@ -41,9 +41,10 @@ export const LineChartFromHighChart = ({
         });
       });
       console.log("final: ", lineSeries);
-      if (chartRef.current && isEmpty(lineSeries)) {
+      if (chartRef.current) {
         const chart = chartRef.current.chart;
-        chart.showLoading("No Data Available");
+        if (isEmpty(lineSeries)) chart.showLoading("No Data Available");
+        else chart.setSize(undefined, 700);
       }
       return lineSeries;
     }, [data]);
@@ -97,6 +98,7 @@ export const LineChartFromHighChart = ({
         title: {
           text: "Car Price",
         },
+        gridLineWidth: 0,
       },
     ],
     navigator: {
