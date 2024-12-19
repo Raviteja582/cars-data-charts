@@ -66,7 +66,7 @@ const CreateDropDownRouterLink = ({
   };
 
   const selectOptions = route.children.map((prop, index) => {
-    return <CreateRouteLink route={prop} index={index} />;
+    return <CreateRouteLink route={prop} key={index} index={index} />;
   });
   return (
     <Link key={index} to={route.layout + "/" + route.path}>
@@ -120,9 +120,11 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
     return routes.map((route, index) => {
       if (route.layout === "/user") {
         if (route.children?.length) {
-          return <CreateDropDownRouterLink route={route} index={index} />;
+          return (
+            <CreateDropDownRouterLink route={route} index={index} key={index} />
+          );
         } else {
-          return <CreateRouteLink route={route} index={index} />;
+          return <CreateRouteLink route={route} key={index} index={index} />;
         }
       }
     });

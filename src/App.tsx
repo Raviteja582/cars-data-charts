@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "layouts/admin";
 import AuthLayout from "layouts/auth";
 import LandingPage from "layouts/landingPage";
+
 const App = () => {
   return (
     <Routes>

@@ -1,33 +1,40 @@
 import { CircularProgress, Typography } from "@mui/material";
-import { BaseSyntheticEvent, useCallback, useState } from "react";
-import AsyncSelect from "react-select/async";
-import { ActionMeta } from "react-select";
+import { BaseSyntheticEvent, useCallback, useEffect, useState } from "react";
+import { ActionMeta, MultiValue } from "react-select";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../../store/store";
 import { UserSelectionOptions } from "../../../store/models/modelsStore";
-import { MultiValue } from "react-select";
-import { capitalize, isEmpty, some } from "lodash";
-import {
-  fetchBrandNameWithPrefix,
-  fetchCarPrices,
-  fetchCityNameWithPrefix,
-  fetchModelNameWithPrefix,
-} from "../../../store/models/modelOperations";
 import { LineChartFromHighChart as LineGraph } from "./LineChartDisplay";
 import "./style.css";
 import Card from "components/card";
-import { Select } from "components/react-select";
-import { getBrandNameWithPrefix } from "store/models/modelQueries";
+import Select from "react-select";
+import WindowedSelect from "react-windowed-select";
+import { isEmpty, isNil, isNull } from "lodash";
+import { CarsInformation } from "store/metrics/metricsStore";
+import { fetchCarsInformation } from "store/metrics/metricQueries";
+import { fetchPrices } from "store/prices/priceOperations";
+
+type Options = {
+  brands: UserSelectionOptions[];
+  models: UserSelectionOptions[];
+  cities: UserSelectionOptions[];
+};
 
 function LineGraphData() {
   const isloading = useSelector<RootState, boolean>(
-    (state) => state.models.isLoading
-  );
-  const pricesData = useSelector<RootState, Record<string, number[][]>>(
-    (state) => state.models.lineSeries
+    (state) => state.prices.loading
   );
 
-  console.log("price data from store: ", JSON.stringify(pricesData));
+  const pricesData = useSelector<
+    RootState,
+    Record<string, Array<[number, number]>>
+  >((state) => {
+    const prices = state.prices;
+    const filter_db = state.prices.filter_name;
+    if (filter_db === "brands") return prices.brands;
+    else if (filter_db === "models") return prices.models;
+    else return prices.cities;
+  });
 
   if (isloading) {
     return (
@@ -36,134 +43,116 @@ function LineGraphData() {
       </div>
     );
   } else if (!isloading && isEmpty(pricesData)) {
-    return (
-        <LineGraph data={{}} />
-    );
+    return <LineGraph data={{}} />;
   } else {
-    return (
-        <LineGraph data={pricesData} />
-    );
+    return <LineGraph data={pricesData} />;
   }
 }
 
 function UserSelectionComponent() {
   const dispatch = useAppDispatch();
 
-  const [brandNames, setBrandNames] = useState<UserSelectionOptions[]>([]);
-  const [modelNames, setModelNames] = useState<UserSelectionOptions[]>([]);
-  const [cityNames, setCityNames] = useState<UserSelectionOptions[]>([]);
-  const [carConditions, setCarConditions] = useState<UserSelectionOptions[]>(
-    []
+  const carsInformation = useSelector<RootState, CarsInformation>(
+    (state) => state.metrics.carsInformation
   );
+  const [carConditions, setCarConditions] = useState<UserSelectionOptions>({
+    value: "all",
+    label: "ALL",
+  });
+  const [filterOptions, setFilterOptions] = useState<Options>(null);
+  const [selectedFilter, setSelectedFilter] = useState<UserSelectionOptions>({
+    label: "",
+    value: "",
+  });
+  const [selectedPriceOptions, setSelectedPriceOptions] = useState<
+    UserSelectionOptions[]
+  >([]);
 
-  const getUserInputBrandNames = useCallback(
-    async (inputValue: string) => {
-      console.log("searched string", inputValue);
-      if (inputValue === "") return [];
-      const results = await dispatch(
-        fetchBrandNameWithPrefix(inputValue)
-      ).unwrap();
-      console.log("inside component: ", results);
-      return results;
+  const getFilterOptions = useCallback(
+    (selectedFilter: keyof Options) => {
+      console.log("selected filter: ", selectedFilter);
+      if (isNil(filterOptions) || isEmpty(selectedFilter)) return [];
+      console.log(
+        "selectedFilter options:",
+        filterOptions[selectedFilter].length
+      );
+      if (filterOptions[selectedFilter]) return filterOptions[selectedFilter];
+      return [];
     },
-    [dispatch]
-  );
-
-  const getUserInputModelNames = useCallback(
-    async (inputValue: string) => {
-      console.log("searched string", inputValue);
-      if (inputValue === "") return [];
-      const results = await dispatch(
-        fetchModelNameWithPrefix({
-          prefixString: inputValue,
-        })
-      ).unwrap();
-      console.log("inside component: ", results);
-      return results;
-    },
-    [dispatch]
-  );
-
-  const getUserInputCityNames = useCallback(
-    async (inputValue: string) => {
-      console.log("searched string", inputValue);
-      if (inputValue === "") return [];
-      const results = await dispatch(
-        fetchCityNameWithPrefix({
-          prefixString: inputValue,
-        })
-      ).unwrap();
-      console.log("inside component: ", results);
-      return results;
-    },
-    [dispatch]
+    [filterOptions]
   );
 
   const handleSubmit = (event: BaseSyntheticEvent) => {
     event.preventDefault();
+    console.log(
+      "Details: ",
+      selectedFilter,
+      carConditions,
+      selectedPriceOptions
+    );
     dispatch(
-      fetchCarPrices({
-        brandNames: brandNames.map((brand) => brand.value),
-        modelNames: modelNames.map((model) => model.value),
-        cities: cityNames.map((city) => city.value),
-        conditions: carConditions.map((condition) => condition.value),
+      fetchPrices({
+        selectedFilter: selectedFilter.value,
+        selectedPriceOptions: selectedPriceOptions.map(
+          (option) => option.value
+        ),
+        carConditions: carConditions.value,
       })
     );
   };
 
   const onSelectChange = useCallback(
     (
-      selection: MultiValue<UserSelectionOptions>,
+      selection: MultiValue<UserSelectionOptions> | unknown,
       actionMeta: ActionMeta<any>
     ) => {
-      if (actionMeta.name === "brand_name") {
-        setBrandNames(() => selection as UserSelectionOptions[]);
-        if (!isEmpty(modelNames)) {
-          let validModels: UserSelectionOptions[] = [];
-          selection.forEach((brand) => {
-            modelNames.forEach((model, indx) => {
-              if (model.brand_name === brand.value) {
-                validModels.push(model);
-              }
-            });
-          });
-          setModelNames(() => validModels);
-        }
-      } else if (actionMeta.name === "model_name") {
-        setModelNames(() => selection as UserSelectionOptions[]);
-        let notSelectedBrands = new Set<UserSelectionOptions>();
-        const currentBrands = brandNames.map((brand) => brand.value);
-        console.log("current brands: ", currentBrands);
-        selection.forEach((model) => {
-          const brands = some(
-            currentBrands,
-            (brand_name: string) => brand_name === model.brand_name
-          );
-          console.log(brands);
-          if (!brands) {
-            notSelectedBrands.add({
-              label: capitalize(model.brand_name),
-              value: model.brand_name,
-            });
-          }
-        });
-
-        if (!isEmpty(notSelectedBrands)) {
-          console.log(notSelectedBrands);
-          setBrandNames((prevValue) => {
-            prevValue.push(...notSelectedBrands);
-            return prevValue;
-          });
-        }
-      } else if (actionMeta.name === "city_name") {
-        setCityNames(() => selection as UserSelectionOptions[]);
-      } else if (actionMeta.name === "car_condition") {
-        setCarConditions(() => selection as UserSelectionOptions[]);
+      if (actionMeta.name === "car_condition") {
+        setCarConditions(() => selection as UserSelectionOptions);
+      } else if (actionMeta.name === "filter_names") {
+        setSelectedPriceOptions(selection as UserSelectionOptions[]);
       }
     },
-    [brandNames, modelNames]
+    []
   );
 
+  useEffect(() => {
+    if (carsInformation.brands.length === 0) {
+      dispatch(fetchCarsInformation());
+    }
+    const processArray = (arr: string[]) =>
+      arr.map((str) => {
+        const decoded = decodeURIComponent(str); // Convert unicode to normal characters
+        const split = decoded.split("_"); // Split the string with '_'
+        const capitalized = split
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+          .join(" "); // Join words back to a string
+        return { label: capitalized, value: str };
+      });
+
+    const options: {
+      brands: UserSelectionOptions[];
+      models: UserSelectionOptions[];
+      cities: UserSelectionOptions[];
+    } = {
+      brands: [],
+      models: [],
+      cities: [],
+    };
+    if (carsInformation.brands) {
+      options.brands = processArray(carsInformation.brands);
+    }
+    if (carsInformation.cities) {
+      options.cities = processArray(carsInformation.cities);
+    }
+    if (carsInformation.models) {
+      options.models = processArray(carsInformation.models);
+    }
+
+    console.debug("config options: ", options.cities.length);
+    setFilterOptions(options);
+  }, [carsInformation, dispatch]);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [customStyles, _] = useState({
     control: (base: any, state: any) => ({
       ...base,
@@ -176,34 +165,26 @@ function UserSelectionComponent() {
   return (
     <div className="flex flex-wrap justify-evenly">
       <div>
-        <Typography>Brand Names: </Typography>
-        <Select
-          value={brandNames}
-          name={"brand_name"}
-          onChange={onSelectChange}
-          styles={customStyles}
-          loadOptions={getUserInputBrandNames}
-        />
-      </div>
-      <div>
-        <Typography>Model Names: </Typography>
-        <Select
-          value={modelNames}
-          name={"model_name"}
-          onChange={onSelectChange}
-          loadOptions={getUserInputModelNames}
-          styles={customStyles}
-        />
-      </div>
-      <div>
-        <Typography>City Names: </Typography>
-        <Select
-          value={cityNames}
-          name={"city_name"}
-          onChange={onSelectChange}
-          loadOptions={getUserInputCityNames}
-          styles={customStyles}
-        />
+        <div>
+          <Typography>Comparison: </Typography>
+          <Select
+            styles={customStyles}
+            value={selectedFilter}
+            options={[
+              { label: "Brands", value: "brands" },
+              { label: "Models", value: "models" },
+              { label: "City", value: "cities" },
+              { label: "", value: "" },
+            ]}
+            onChange={(value) => {
+              if (value.value === "") {
+                setSelectedPriceOptions([]);
+                setCarConditions({ value: "all", label: "ALL" });
+              }
+              setSelectedFilter(value);
+            }}
+          />
+        </div>
       </div>
       <div>
         <div>
@@ -216,6 +197,23 @@ function UserSelectionComponent() {
             ]}
             onChange={onSelectChange}
             styles={customStyles}
+            isClearable
+          />
+        </div>
+      </div>
+      <div>
+        <div>
+          <Typography>Select Entities:</Typography>
+          <WindowedSelect
+            isMulti
+            onChange={onSelectChange}
+            options={getFilterOptions(selectedFilter.value as keyof Options)}
+            isDisabled={
+              isEmpty(selectedFilter.value) || isNull(selectedFilter.value)
+            }
+            name={"filter_names"}
+            styles={customStyles}
+            windowThreshold={100}
           />
         </div>
       </div>

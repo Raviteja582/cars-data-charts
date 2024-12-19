@@ -8,15 +8,6 @@ export interface UserSelectionOptions {
   model_name?: string;
 }
 
-export interface CarModel {
-  // Exactly same as firebase collection
-  id: string;
-  brand_name: string;
-  model_name: string;
-  city_name: string;
-  car_condition: string;
-}
-
 export interface ModelState {
   isLoading: boolean;
   lineSeries: Record<string, number[][]>;

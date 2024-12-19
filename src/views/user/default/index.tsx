@@ -5,8 +5,27 @@ import ElectricCarIcon from "@mui/icons-material/ElectricCar";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import NumbersIcon from "@mui/icons-material/Numbers";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { fetchCarsInformation } from "store/metrics/metricQueries";
+import { useAppDispatch, RootState } from "store/store";
 
 const Dashboard = () => {
+  const dispatch = useAppDispatch();
+  const metrics = useSelector((state: RootState) => state.metrics);
+
+  useEffect(() => {
+    dispatch(fetchCarsInformation());
+  }, [dispatch]);
+
+  if (metrics.loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (metrics.error) {
+    return <div>Error: {metrics.error}</div>;
+  }
+
   return (
     <div>
       {/* Card widget */}

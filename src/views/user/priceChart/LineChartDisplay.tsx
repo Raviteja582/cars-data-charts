@@ -16,7 +16,6 @@ export const LineChartFromHighChart = ({
     useCallback((): Array<Highcharts.SeriesOptionsType> => {
       let lineSeries: Array<Highcharts.SeriesOptionsType> = [];
       Object.keys(data).forEach((name: string) => {
-        console.log(name, data[name]);
         if (data[name].length === 0) {
           console.log("No data for name: ", name);
           return;

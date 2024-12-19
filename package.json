@@ -19,6 +19,7 @@
     "framer-motion": "^7.10.2",
     "highcharts": "^11.4.8",
     "highcharts-react-official": "^3.2.1",
+    "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -28,6 +29,7 @@
     "react-router-dom": "^6.4.0",
     "react-scripts": "5.0.1",
     "react-select": "^5.8.1",
+    "react-windowed-select": "^5.2.0",
     "tailwindcss-rtl": "^0.9.0",
     "typescript": "^4.7.4",
     "web-vitals": "^2.1.4"
@@ -58,6 +60,7 @@
     ]
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/react-calendar": "^3.5.2",
     "@types/react-router-dom": "^5.3.3",
     "@types/react-table": "^7.7.12",

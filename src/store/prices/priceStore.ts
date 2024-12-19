@@ -1,47 +1,59 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { fetchCarPricesByIds } from "./priceOperations";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { fetchPrices } from "./priceOperations";
 
-export type PricePerMonth = {
-  January: number[];
-  February: number[];
-  March: number[];
-  April: number[];
-  May: number[];
-  June: number[];
-  July: number[];
-  August: number[];
-  September: number[];
-  October: number[];
-  November: number[];
-  December: number[];
+export type PriceData = {
+  new_avg_price: number;
+  new_sales_count: number;
+  total_avg_price: number;
+  total_sales_count: number;
+  used_avg_price: number;
+  used_sales_count: number;
 };
 
-export type Prices = Record<string, PricePerMonth>;
-
-export interface PriceState {
-  currentPriceData: Record<string, Prices>;
-  isFetchingPrice: boolean;
-}
+export type PriceState = {
+  brands: Record<string, Array<[number, number]>>;
+  models: Record<string, Array<[number, number]>>;
+  cities: Record<string, Array<[number, number]>>;
+  loading: boolean;
+  error: string;
+  filter_name: string;
+};
 
 const initialState: PriceState = {
-  currentPriceData: {},
-  isFetchingPrice: false,
+  brands: {},
+  models: {},
+  cities: {},
+  loading: false,
+  error: null,
+  filter_name: null,
 };
 
 export const pricesSlice = createSlice({
   name: "prices",
   initialState,
-  reducers: {},
+  reducers: {
+    setFilterName: (state, action: PayloadAction<string>) => {
+      state.filter_name = action.payload;
+    },
+  },
   extraReducers(builder) {
-    builder.addCase(fetchCarPricesByIds.pending, (state, action) => {
-      state.isFetchingPrice = true;
+    builder.addCase(fetchPrices.pending, (state, action) => {
+      state.loading = true;
     });
-    builder.addCase(fetchCarPricesByIds.fulfilled, (state, action) => {
-      state.currentPriceData = action.payload;
-      console.log("price store current priceData: ", state.currentPriceData);
+    builder.addCase(fetchPrices.fulfilled, (state, action) => {
+      const key = action.payload.key;
+      const opt = action.payload.output;
+      state.filter_name = key;
+      if (key === "brands") {
+        state.brands = { ...state.brands, ...opt };
+      } else if (key === "models") {
+        state.models = { ...state.models, ...opt };
+      } else {
+        state.cities = { ...state.cities, ...opt };
+      }
     });
-    builder.addMatcher(fetchCarPricesByIds.settled, (state, action) => {
-      state.isFetchingPrice = false;
+    builder.addMatcher(fetchPrices.settled, (state, action) => {
+      state.loading = false;
     });
   },
 });
