@@ -55,7 +55,7 @@ Built an interactive dashboard that visualizes how car prices for a given **bran
 </p>
 
 ### ***Watch Below Demo Video for App Real-time Functionality***
-[![Watch the demo](./results/demo/thumb.png)](./assets/demo/webdemo.mp4)
+[![Watch the demo](./results/demo/thumb.png)](./results/demo/webdemo.mp4)
 
 ## 🚀 How to Run Locally
 ### Instructions:
