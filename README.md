@@ -42,6 +42,11 @@ Built an interactive dashboard that visualizes how car prices for a given **bran
 | Deployment   | Docker, GitHub Actions (CI / CD), AWS (optional)  |
 
 ## 📊 Screenshots & Demo
+### ***Database Schema***
+<p align="center">
+  <img src="./results/arch/Cars-Database.png" alt="Single-series price chart" width="600">
+</p>
+
 ### ***Single Line Graph of Single Car***:
 <p align="center">
   <img src="./results/images/Price-Chart.png" alt="Single-series price chart" width="600">
